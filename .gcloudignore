@@ -1,0 +1,10 @@
+.git
+.gitignore
+.venv/
+.env
+__pycache__/
+*.pyc
+docs/
+index.html
+README.md
+old-street-mutual-brief.md
