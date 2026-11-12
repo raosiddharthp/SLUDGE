@@ -16,11 +16,13 @@ CASES = [
     ("failed_attempts", "INT64"), ("urgency", "STRING"), ("headline", "STRING"),
     ("created_at", "TIMESTAMP"), ("decided_at", "TIMESTAMP"), ("reviewer", "STRING"),
     ("lawful_basis", "STRING"), ("retain_until", "TIMESTAMP"),
+    ("review_note", "STRING"),
 ]
 FINDINGS = [
     ("case_id", "STRING"), ("member_id", "STRING"), ("created_at", "TIMESTAMP"), ("idx", "INT64"),
     ("driver", "STRING"), ("confidence", "FLOAT64"), ("repeat_disclosure", "BOOL"),
     ("grounded", "BOOL"), ("adjusted", "BOOL"), ("decision", "STRING"), ("evidence_n", "INT64"),
+    ("rationale", "STRING"), ("evidence", "STRING"),
 ]
 
 

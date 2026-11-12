@@ -35,4 +35,6 @@ assert rows[0]["repeat_disclosure"] is True and rows[1]["adjusted"] is True
 srow = case_row(sam)
 assert srow["accepted_n"] == 0 and srow["urgency"] is None and srow["decided_at"] is None
 assert finding_rows(sam) == []
+assert __import__("json").loads(rows[0]["evidence"])[0]["quote"] == "x"
+assert row["review_note"] is None
 print("all flatten tests passed")
