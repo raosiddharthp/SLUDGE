@@ -1,0 +1,79 @@
+{
+  "model": "gemini-3.5-flash-lite",
+  "runs": 3,
+  "members": {
+    "M-1001": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "life_events": 3
+      },
+      "mean_confidence": {
+        "life_events": 0.95
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 3141,
+        "out": 552
+      }
+    },
+    "M-1002": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "resilience": 3
+      },
+      "mean_confidence": {
+        "resilience": 0.8
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2823,
+        "out": 871
+      }
+    },
+    "M-1003": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "capability": 3
+      },
+      "mean_confidence": {
+        "capability": 0.95
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2661,
+        "out": 717
+      }
+    },
+    "M-1004": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "resilience": 1,
+        "health": 3
+      },
+      "mean_confidence": {
+        "health": 0.95,
+        "resilience": 0.95
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2919,
+        "out": 711
+      }
+    },
+    "M-1005": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {},
+      "mean_confidence": {},
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2433,
+        "out": 81
+      }
+    }
+  }
+}

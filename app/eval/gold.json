@@ -1,0 +1,7 @@
+{
+  "M-1001": {"required": ["life_events"], "allowed": []},
+  "M-1002": {"required": ["resilience"], "allowed": []},
+  "M-1003": {"required": ["capability"], "allowed": []},
+  "M-1004": {"required": ["health"], "allowed": ["resilience"]},
+  "M-1005": {"required": [], "allowed": []}
+}

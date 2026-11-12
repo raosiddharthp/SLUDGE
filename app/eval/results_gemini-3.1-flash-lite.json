@@ -1,0 +1,77 @@
+{
+  "model": "gemini-3.1-flash-lite",
+  "runs": 3,
+  "members": {
+    "M-1001": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "life_events": 3
+      },
+      "mean_confidence": {
+        "life_events": 0.95
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 3141,
+        "out": 735
+      }
+    },
+    "M-1002": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "resilience": 3
+      },
+      "mean_confidence": {
+        "resilience": 0.8
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2823,
+        "out": 744
+      }
+    },
+    "M-1003": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "capability": 3
+      },
+      "mean_confidence": {
+        "capability": 0.9
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2661,
+        "out": 903
+      }
+    },
+    "M-1004": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {
+        "health": 3
+      },
+      "mean_confidence": {
+        "health": 0.95
+      },
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2919,
+        "out": 624
+      }
+    },
+    "M-1005": {
+      "ok": 3,
+      "errors": 0,
+      "drivers": {},
+      "mean_confidence": {},
+      "bad_quotes": 0,
+      "tokens": {
+        "in": 2433,
+        "out": 84
+      }
+    }
+  }
+}
