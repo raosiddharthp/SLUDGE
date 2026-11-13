@@ -41,13 +41,13 @@ The Governance page has seven sections, one for each role that cares about the d
 
 | Section | What it answers |
 | --- | --- |
-| Overdraft | How much of the monitored population the system covers. |
-| Vetter | Which findings are pending, and which are decided. |
-| Escalade | Which cases were recommended for escalation. |
-| Paisawala | Whether the pipeline is healthy. |
-| Redact | Lawful basis, retention dates and who opened each case. |
-| Ledger | What the system costs to run. |
-| Trustwell | How often reviewers override the model, and how well its findings are grounded. |
+| Overdraft | Whether the system looks at every member, and whether each flag traces back to its evidence. |
+| Vetter | What the system found, and what the reviewer decided. |
+| Escalade | Whether the findings are grounded in the source record. |
+| Paisawala | Whether the pipeline is reliable, and where it needs retries. |
+| Redact | How long each case is kept, on what lawful basis, and who has looked at it. |
+| Ledger | What each assessment costs. |
+| Trustwell | Whether reviewers weigh each finding or rubber-stamp it, and whether the model's confidence is drifting. |
 
 Each section shows a short question, a status line and a table.
 
