@@ -22,6 +22,11 @@ def case_row(c):
     }
 
 
+def access_row(a):
+    return {"case_id": a.get("case_id"), "member_id": a.get("member_id"), "actor": a.get("actor"),
+            "action": a.get("action"), "viewed_at": _ts(a.get("at")), "retain_until": _ts(a.get("retain_until"))}
+
+
 def _finding(base, i, f, grounded, adjusted, decision):
     return {**base, "idx": i, "driver": f.get("driver"), "confidence": f.get("confidence"),
             "repeat_disclosure": bool(f.get("repeat_disclosure")), "grounded": grounded,

@@ -3,8 +3,9 @@ import os
 
 from google.cloud import bigquery
 
-from app.agents.governance.flatten import case_row, finding_rows
+from app.agents.governance.flatten import access_row, case_row, finding_rows
 from app.agents.manager.store import COLLECTION, _db
+from app.web.audit import COLLECTION as ACCESS_COLLECTION
 
 PROJECT = os.environ.get("SLUDGE_PROJECT", "lumen-poc-srao26")
 DATASET = "sludge_gov"
@@ -23,6 +24,10 @@ FINDINGS = [
     ("driver", "STRING"), ("confidence", "FLOAT64"), ("repeat_disclosure", "BOOL"),
     ("grounded", "BOOL"), ("adjusted", "BOOL"), ("decision", "STRING"), ("evidence_n", "INT64"),
     ("rationale", "STRING"), ("evidence", "STRING"),
+]
+ACCESS = [
+    ("case_id", "STRING"), ("member_id", "STRING"), ("actor", "STRING"), ("action", "STRING"),
+    ("viewed_at", "TIMESTAMP"), ("retain_until", "TIMESTAMP"),
 ]
 
 
@@ -45,7 +50,9 @@ def sync():
     f_rows = [r for c in cases for r in finding_rows(c)]
     _load(bq, "cases", CASES, case_rows)
     _load(bq, "findings", FINDINGS, f_rows)
-    return {"cases": len(case_rows), "findings": len(f_rows)}
+    access_rows = [access_row(d.to_dict()) for d in _db().collection(ACCESS_COLLECTION).stream()]
+    _load(bq, "access_log", ACCESS, access_rows)
+    return {"cases": len(case_rows), "findings": len(f_rows), "access": len(access_rows)}
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 """Offline test of the Firestore-to-BigQuery flattening. No network."""
 from datetime import datetime, timezone
 
-from app.agents.governance.flatten import case_row, finding_rows
+from app.agents.governance.flatten import access_row, case_row, finding_rows
 
 T = datetime(2026, 11, 12, 10, 0, tzinfo=timezone.utc)
 
@@ -37,4 +37,8 @@ assert srow["accepted_n"] == 0 and srow["urgency"] is None and srow["decided_at"
 assert finding_rows(sam) == []
 assert __import__("json").loads(rows[0]["evidence"])[0]["quote"] == "x"
 assert row["review_note"] is None
+dt = __import__("datetime")
+a = access_row({"case_id": "c", "member_id": "M-1", "actor": "public-demo", "action": "view_case",
+                "at": dt.datetime(2026, 11, 13, tzinfo=dt.timezone.utc), "retain_until": None})
+assert a["viewed_at"] == "2026-11-13T00:00:00+00:00" and a["retain_until"] is None and a["actor"] == "public-demo"
 print("all flatten tests passed")

@@ -42,14 +42,18 @@ FROM `lumen-poc-srao26.sludge_gov.cases`
 GROUP BY day;
 
 CREATE OR REPLACE VIEW `lumen-poc-srao26.sludge_gov.lens_redact` AS
-SELECT case_id, member_id, created_at,
-       IFNULL(lawful_basis, 'not recorded') AS lawful_basis,
-       retain_until,
-       DATE_DIFF(DATE(retain_until), CURRENT_DATE(), DAY) AS days_remaining,
-       CASE WHEN retain_until IS NULL THEN 'not recorded'
-            WHEN retain_until < CURRENT_TIMESTAMP() THEN 'expired'
-            ELSE 'active' END AS retention_state
-FROM `lumen-poc-srao26.sludge_gov.cases`;
+SELECT c.created_at, c.case_id, c.member_id,
+       IFNULL(c.lawful_basis, 'not recorded') AS lawful_basis,
+       c.retain_until,
+       DATE_DIFF(DATE(c.retain_until), CURRENT_DATE(), DAY) AS days_remaining,
+       CASE WHEN c.retain_until IS NULL THEN 'not recorded'
+            WHEN c.retain_until < CURRENT_TIMESTAMP() THEN 'expired'
+            ELSE 'active' END AS retention_state,
+       IFNULL(a.access_entries, 0) AS access_entries,  -- one entry per case per minute
+       a.last_viewed
+FROM `lumen-poc-srao26.sludge_gov.cases` c
+LEFT JOIN (SELECT case_id, COUNT(*) AS access_entries, MAX(viewed_at) AS last_viewed
+           FROM `lumen-poc-srao26.sludge_gov.access_log` GROUP BY case_id) a ON a.case_id = c.case_id;
 
 CREATE OR REPLACE VIEW `lumen-poc-srao26.sludge_gov.lens_ledger` AS
 WITH priced AS (
