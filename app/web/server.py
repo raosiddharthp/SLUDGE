@@ -4,16 +4,39 @@ import logging
 from datetime import date, datetime
 from decimal import Decimal
 
+from pathlib import Path
+
 from starlette.applications import Starlette
 from starlette.concurrency import run_in_threadpool
-from starlette.responses import Response
-from starlette.routing import Route
+from starlette.middleware import Middleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import FileResponse, Response
+from starlette.routing import Mount, Route
+from starlette.staticfiles import StaticFiles
 
 from app.web.cache import TTLCache
 from app.web.rules import CASE_ID, LENSES, clean_decide, clean_member
 
 log = logging.getLogger("sludge.web")
 MAX_BODY = 4096
+STATIC = Path(__file__).parent / "static"
+SECURITY_HEADERS = {
+    "Content-Security-Policy": "default-src 'self'; style-src 'self' https://fonts.googleapis.com; "
+                               "font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; "
+                               "frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "no-referrer",
+}
+
+
+class SecurityHeaders(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        for key, value in SECURITY_HEADERS.items():
+            response.headers.setdefault(key, value)
+        if request.url.path.startswith("/api/"):
+            response.headers["Cache-Control"] = "no-store"
+        return response
 
 
 def _default(obj):
@@ -47,6 +70,9 @@ async def _read(request):
 
 def make_app(data, lens_cache=None):
     cache = lens_cache or TTLCache(300)
+
+    def home(request):
+        return FileResponse(STATIC / "index.html", media_type="text/html")
 
     def health(request):
         return _json({"ok": True})
@@ -123,7 +149,9 @@ def make_app(data, lens_cache=None):
             return _json({"error": "could not record the decision"}, 500)
         return _json(outcome)
 
-    return Starlette(routes=[
+    return Starlette(middleware=[Middleware(SecurityHeaders)], routes=[
+        Route("/", home),
+        Mount("/static", app=StaticFiles(directory=STATIC), name="static"),
         Route("/health", health),
         Route("/api/queue", queue),
         Route("/api/override", override),

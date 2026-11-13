@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SLUDGE reviewer — Old Street Mutual (synthetic demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/app.css"/>
+<link rel="icon" href="data:,"/>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-breadcrumb">old-street-mutual / sludge / reviewer</div>
+  <div class="topbar-right">
+    <a class="topbar-link" href="https://raosiddharthp.github.io/SLUDGE/">Design doc</a>
+    <span class="topbar-tag">synthetic data — portfolio demo</span>
+  </div>
+</div>
+<main class="wrap">
+  <header class="intro">
+    <h1>Reviewer <em>queue</em></h1>
+    <p>Old Street Mutual is a fictional building society and every member here is synthetic. SLUDGE flags possible Consumer Duty outcome risks from member records, and a person confirms or dismisses each finding. Evidence is quoted verbatim from the source record.</p>
+  </header>
+  <div class="strip">
+    <div>
+      <div class="strip-label">Assess a member</div>
+      <div class="assess-row">
+        <label for="member" class="sr-only">Member</label>
+        <select id="member"></select>
+        <button id="assess" class="btn primary" type="button">Run assessment</button>
+        <button id="refresh" class="btn" type="button">Refresh</button>
+      </div>
+      <p class="hint" id="usage">Checking today's allowance…</p>
+    </div>
+    <div>
+      <div class="strip-label">Reviewer behaviour</div>
+      <p id="override" class="override">Loading…</p>
+    </div>
+  </div>
+  <div id="status" class="status" role="status" aria-live="polite">Loading…</div>
+  <div class="cols">
+    <section aria-labelledby="queue-title">
+      <h2 id="queue-title" class="col-title">Waiting for review</h2>
+      <div id="queue-list"></div>
+    </section>
+    <section id="case" class="panel"><p class="empty">Select a case from the queue.</p></section>
+  </div>
+</main>
+<script src="/static/app.js" defer></script>
+</body>
+</html>
