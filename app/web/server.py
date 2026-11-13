@@ -1,17 +1,19 @@
-"""Read API for the reviewer app. The data layer is injected, so routing and guards test offline."""
+"""API for the reviewer app. The data layer is injected, so routing, guards and caching test offline."""
 import json
 import logging
 from datetime import date, datetime
 from decimal import Decimal
 
 from starlette.applications import Starlette
+from starlette.concurrency import run_in_threadpool
 from starlette.responses import Response
 from starlette.routing import Route
 
 from app.web.cache import TTLCache
-from app.web.rules import CASE_ID, LENSES
+from app.web.rules import CASE_ID, LENSES, clean_decide, clean_member
 
 log = logging.getLogger("sludge.web")
+MAX_BODY = 4096
 
 
 def _default(obj):
@@ -26,6 +28,23 @@ def _json(payload, status=200):
     return Response(json.dumps(payload, default=_default), status_code=status, media_type="application/json")
 
 
+async def _read(request):
+    """Returns (body, error_response). Rejects oversized or malformed JSON before anything else runs."""
+    try:
+        declared = int(request.headers.get("content-length") or 0)
+    except ValueError:
+        declared = 0
+    if declared > MAX_BODY:
+        return None, _json({"error": "request too large"}, 413)
+    raw = await request.body()
+    if len(raw) > MAX_BODY:
+        return None, _json({"error": "request too large"}, 413)
+    try:
+        return json.loads(raw or b"null"), None
+    except ValueError:
+        return None, _json({"error": "invalid JSON"}, 400)
+
+
 def make_app(data, lens_cache=None):
     cache = lens_cache or TTLCache(300)
 
@@ -38,12 +57,23 @@ def make_app(data, lens_cache=None):
     def override(request):
         return _json(data.override())
 
+    def usage(request):
+        return _json(data.usage())
+
     def case(request):
         case_id = request.path_params["case_id"]
         if not CASE_ID.match(case_id):
             return _json({"error": "not found"}, 404)
         found = data.case(case_id)
-        return _json(found) if found else _json({"error": "not found"}, 404)
+        if not found:
+            return _json({"error": "not found"}, 404)
+        try:
+            data.log_view(case_id, found.get("member_id"))
+        except Exception as exc:
+            # Fail closed: a view that cannot be logged is not shown.
+            log.warning("access log write failed: %s", type(exc).__name__)
+            return _json({"error": "access log unavailable"}, 503)
+        return _json(found)
 
     def lens(request):
         name = request.path_params["name"]
@@ -56,10 +86,50 @@ def make_app(data, lens_cache=None):
             return _json({"error": "lens unavailable"}, 502)
         return _json({"lens": name, "rows": rows})
 
+    async def assess(request):
+        body, error = await _read(request)
+        if error:
+            return error
+        try:
+            member = clean_member(body)
+        except ValueError as exc:
+            return _json({"error": str(exc)}, 400)
+        slot = await run_in_threadpool(data.take_slot)
+        if not slot["allowed"]:
+            return _json({"error": "daily limit reached", "usage": slot}, 429)
+        try:
+            result = await run_in_threadpool(data.assess, member)
+        except Exception as exc:
+            log.warning("assessment failed: %s", type(exc).__name__)
+            return _json({"error": "assessment failed", "usage": slot}, 502)
+        return _json({"result": result, "usage": slot})
+
+    async def decide(request):
+        body, error = await _read(request)
+        if error:
+            return error
+        try:
+            case_id, decisions, reviewer, note = clean_decide(body)
+        except ValueError as exc:
+            return _json({"error": str(exc)}, 400)
+        try:
+            outcome = await run_in_threadpool(data.decide, case_id, decisions, reviewer, note)
+        except ValueError as exc:
+            return _json({"error": str(exc)}, 400)
+        except KeyError:
+            return _json({"error": "not found"}, 404)
+        except Exception as exc:
+            log.warning("decide failed: %s", type(exc).__name__)
+            return _json({"error": "could not record the decision"}, 500)
+        return _json(outcome)
+
     return Starlette(routes=[
         Route("/healthz", health),
         Route("/api/queue", queue),
         Route("/api/override", override),
+        Route("/api/usage", usage),
         Route("/api/case/{case_id}", case),
         Route("/api/lens/{name}", lens),
+        Route("/api/assess", assess, methods=["POST"]),
+        Route("/api/decide", decide, methods=["POST"]),
     ])
