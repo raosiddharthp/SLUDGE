@@ -128,6 +128,7 @@ def make_app(data, lens_cache=None):
         except Exception as exc:
             log.warning("assessment failed: %s", type(exc).__name__)
             return _json({"error": "assessment failed", "usage": slot}, 502)
+        cache.clear()  # the governed data just changed
         return _json({"result": result, "usage": slot})
 
     async def decide(request):
@@ -147,6 +148,7 @@ def make_app(data, lens_cache=None):
         except Exception as exc:
             log.warning("decide failed: %s", type(exc).__name__)
             return _json({"error": "could not record the decision"}, 500)
+        cache.clear()  # the governed data just changed
         return _json(outcome)
 
     return Starlette(middleware=[Middleware(SecurityHeaders)], routes=[

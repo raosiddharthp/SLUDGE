@@ -5,6 +5,6 @@
 __pycache__/
 *.pyc
 docs/
-index.html
+/index.html
 README.md
 old-street-mutual-brief.md

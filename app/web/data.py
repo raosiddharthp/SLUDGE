@@ -6,6 +6,7 @@ import os
 from google.cloud import bigquery
 
 from app.agents.manager.decisions import decide_case
+from app.agents.manager.govern import notify_governance
 from app.agents.manager.queue import override_stats, pending_queue
 from app.agents.manager.store import COLLECTION, RETENTION_DAYS, _db
 from app.common import cap
@@ -16,6 +17,8 @@ from app.web.rules import LENSES
 PROJECT = os.environ.get("SLUDGE_PROJECT", "lumen-poc-srao26")
 DATASET = "sludge_gov"
 MANAGER_URL = os.environ.get("SLUDGE_MANAGER_URL", "")
+GOVERNANCE_URL = os.environ.get("SLUDGE_GOVERNANCE_URL", "")
+SYNC_WAIT = 10  # seconds the reviewer waits for the governed dataset to catch up
 MAX_BYTES_BILLED = 100 * 1024 * 1024  # hard ceiling per lens query
 
 
@@ -58,7 +61,8 @@ def assess(member_id):
 
 def decide(case_id, decisions, reviewer, note):
     update = decide_case(case_id, decisions, reviewer, note)
-    return {"outcome": update["outcome"], "review_state": update["review_state"]}
+    sync = asyncio.run(notify_governance(GOVERNANCE_URL, call_agent, timeout=SYNC_WAIT))
+    return {"outcome": update["outcome"], "review_state": update["review_state"], "governance": sync}
 
 
 def log_view(case_id, member_id):

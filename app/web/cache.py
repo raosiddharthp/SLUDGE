@@ -14,3 +14,6 @@ class TTLCache:
         value = fn()
         self.items[key] = (now, value)
         return value
+
+    def clear(self):
+        self.items.clear()
