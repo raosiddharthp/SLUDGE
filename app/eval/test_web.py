@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime, timezone
 
 from starlette.testclient import TestClient
@@ -148,4 +149,14 @@ r = client.post("/api/decide", json=ok)
 assert r.status_code == 500 and "secret detail" not in r.text
 # Cloud Run reserves paths ending in z (e.g. /healthz) on run.app URLs.
 assert not [r.path for r in make_app(Fake()).routes if r.path.rstrip("/").endswith("z")]
+# --- static UI and headers
+r = client.get("/")
+assert r.status_code == 200 and "text/html" in r.headers["content-type"] and "SLUDGE" in r.text
+assert "default-src 'self'" in r.headers["content-security-policy"]
+assert r.headers["x-content-type-options"] == "nosniff"
+assert not re.search(r"<script(?![^>]*\bsrc=)", r.text) and "onclick=" not in r.text
+js = client.get("/static/app.js")
+assert js.status_code == 200 and "innerHTML" not in js.text and "insertAdjacentHTML" not in js.text
+assert client.get("/static/..%2Fserver.py").status_code == 404
+assert client.get("/api/queue").headers["cache-control"] == "no-store"
 print("all web tests passed")
