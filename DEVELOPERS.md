@@ -41,8 +41,8 @@ The Governance sync is a bounded wait rather than a parallel call because Cloud 
 | Variable | Used by | Meaning |
 | --- | --- | --- |
 | `SLUDGE_AGENT` | all agents | Which agent module the image starts. |
-| `SLUDGE_APP` | web | Overrides the default module path in the Dockerfile `CMD`. |
-| `SLUDGE_STORE` | manager, web | Which case store to use. See `app/agents/manager/store.py`. |
+| `SLUDGE_APP` | any service | Overrides the default ASGI app path in the Dockerfile `CMD`. |
+| `SLUDGE_STORE` | manager | Set to `firestore` to save cases to Firestore. Read in `app/agents/manager/agent.py`. |
 | `A2A_HOST`, `A2A_PORT`, `A2A_PROTOCOL` | agents | How an agent advertises itself. |
 | `SLUDGE_INGEST_URL`, `SLUDGE_DETECTION_URL`, `SLUDGE_ESCALATION_URL`, `SLUDGE_GOVERNANCE_URL` | manager | Addresses of the other agents. |
 | `SLUDGE_MANAGER_URL` | web | Address of the Manager. |
