@@ -12,14 +12,17 @@ from google.adk.agents.invocation_context import InvocationContext
 from google.adk.events import Event
 from google.genai import types
 
+from app.agents.manager.govern import notify_governance
 from app.agents.manager.orchestrate import assess
 from app.agents.manager.store import save_case
+from app.common.a2a_client import call_agent
 
 load_dotenv()
 
 INGEST_URL = os.environ.get("SLUDGE_INGEST_URL", "http://localhost:8001")
 DETECTION_URL = os.environ.get("SLUDGE_DETECTION_URL", "http://localhost:8002")
 ESCALATION_URL = os.environ.get("SLUDGE_ESCALATION_URL", "http://localhost:8004")
+GOVERNANCE_URL = os.environ.get("SLUDGE_GOVERNANCE_URL", "")
 
 
 class ManagerAgent(BaseAgent):
@@ -34,6 +37,8 @@ class ManagerAgent(BaseAgent):
                     payload["case_id"] = await asyncio.to_thread(save_case, payload)
                 except Exception as exc:
                     payload["store_error"] = f"{type(exc).__name__}: {str(exc)[:120]}"
+                else:
+                    payload["governance"] = await notify_governance(GOVERNANCE_URL, call_agent)
         else:
             payload = {"error": "expected a member ID such as M-1001"}
         yield Event(
