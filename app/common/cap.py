@@ -42,3 +42,11 @@ def take(db, cap=None, now=None):
     """Try to take one slot for today (UTC). db is a Firestore client."""
     cap = limit() if cap is None else cap
     return _take(db.transaction(), db.collection(COLLECTION).document(day_key(now)), cap)
+
+
+def peek(db, cap=None, now=None):
+    """Today's usage without taking a slot."""
+    cap = limit() if cap is None else cap
+    snap = db.collection(COLLECTION).document(day_key(now)).get()
+    used = (snap.to_dict() or {}).get("count", 0) if snap.exists else 0
+    return {"used": used, "cap": cap, "remaining": max(cap - used, 0)}
