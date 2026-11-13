@@ -49,6 +49,9 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text); font
 .topbar-breadcrumb { font-family: var(--mono); font-size: 11px; color: var(--text3); }
 .topbar-right { display: flex; align-items: center; gap: 16px; }
 .topbar-tag { font-family: var(--mono); font-size: 10px; padding: 3px 8px; background: var(--bg3); border-radius: 99px; color: var(--text2); }
+.topbar-launch { font-family: var(--mono); font-size: 11px; padding: 5px 12px; background: var(--text, #1a1a18); color: var(--bg, #fafaf8); border-radius: var(--r, 6px); text-decoration: none; }
+.topbar-launch:hover { background: var(--teal, #0f766e); }
+.topbar-launch:focus-visible { outline: 2px solid var(--teal, #0f766e); outline-offset: 2px; }
 
 .content { padding: 3rem 2.5rem 5rem; max-width: 860px; }
 
@@ -255,7 +258,7 @@ footer.doc-footer { border-top: 1px solid var(--border); padding: 2.5rem; text-a
 <div class="main">
   <div class="topbar">
     <div class="topbar-breadcrumb">old-street-mutual / sludge / design-doc</div>
-    <div class="topbar-right"><span class="topbar-tag">fictional client — portfolio artefact</span></div>
+    <div class="topbar-right"><span class="topbar-tag">fictional client — portfolio artefact</span><a class="topbar-launch" href="https://sludge-web-807627578504.us-east1.run.app" target="_blank" rel="noopener">Launch app →</a></div>
   </div>
 
   <div class="content">
