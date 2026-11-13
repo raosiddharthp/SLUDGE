@@ -124,7 +124,7 @@ def make_app(data, lens_cache=None):
         return _json(outcome)
 
     return Starlette(routes=[
-        Route("/healthz", health),
+        Route("/health", health),
         Route("/api/queue", queue),
         Route("/api/override", override),
         Route("/api/usage", usage),

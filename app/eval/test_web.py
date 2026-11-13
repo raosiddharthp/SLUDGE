@@ -70,7 +70,7 @@ def build():
 
 # --- read side
 fake, t, client = build()
-assert client.get("/healthz").json() == {"ok": True}
+assert client.get("/health").json() == {"ok": True}
 assert client.get("/api/queue").json()["queue"][0]["created_at"] == "2026-11-13T08:52:00+00:00"
 assert client.get("/api/override").json()["signal"] == "insufficient_data"
 assert client.get("/api/usage").json() == {"used": 3, "cap": 20, "remaining": 17}
@@ -146,4 +146,6 @@ assert client.post("/api/decide", json=ok).status_code == 404
 fake.decide_error = RuntimeError("secret detail")
 r = client.post("/api/decide", json=ok)
 assert r.status_code == 500 and "secret detail" not in r.text
+# Cloud Run reserves paths ending in z (e.g. /healthz) on run.app URLs.
+assert not [r.path for r in make_app(Fake()).routes if r.path.rstrip("/").endswith("z")]
 print("all web tests passed")
