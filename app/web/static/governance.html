@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SLUDGE governance — Old Street Mutual (synthetic demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/app.css"/>
+<link rel="icon" href="data:,"/>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-breadcrumb">old-street-mutual / sludge / governance</div>
+  <div class="topbar-right">
+    <a class="topbar-link" href="/">Queue</a>
+    <a class="topbar-link" href="/static/governance.html" aria-current="page">Governance</a>
+    <a class="topbar-link" href="https://raosiddharthp.github.io/SLUDGE/">Design doc</a>
+    <span class="topbar-tag">synthetic data — portfolio demo</span>
+  </div>
+</div>
+<main class="wrap">
+  <header class="intro">
+    <h1>Governance <em>lenses</em></h1>
+    <p>Seven views over the same governance dataset in BigQuery. Each one answers a single question for a single role. Every member is synthetic. Results are cached for five minutes, and each table shows the latest rows only.</p>
+  </header>
+  <div id="lenses"></div>
+</main>
+<script src="/static/governance.js" defer></script>
+</body>
+</html>
