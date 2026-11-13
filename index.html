@@ -250,7 +250,7 @@ footer.doc-footer { border-top: 1px solid var(--border); padding: 2.5rem; text-a
   <div class="stack-block">
     <div class="stack-title">Register</div>
     <div class="stack-item"><strong>5 Agents</strong>Ingest · Detection · Manager · Escalation · Governance</div>
-    <div class="stack-item"><strong>10 ADRs</strong>full rationale, rejected alternatives</div>
+    <div class="stack-item"><strong>11 ADRs</strong>full rationale, rejected alternatives</div>
     <div class="stack-item"><strong>7 + 4 People</strong>stakeholders and customer personas</div>
   </div>
 </nav>
@@ -783,10 +783,11 @@ footer.doc-footer { border-top: 1px solid var(--border); padding: 2.5rem; text-a
     <div class="adr-card"><div class="adr-head"><span class="adr-id">ADR-08</span><span class="adr-title">Manager Agent for runtime authority</span></div><div class="adr-row"><strong>Satisfies:</strong> US-07. <strong>Rejected:</strong> peer-to-peer coordination — accountability vacuum.</div></div>
     <div class="adr-card"><div class="adr-head"><span class="adr-id">ADR-09</span><span class="adr-title">Tiered, role-mapped explainability</span></div><div class="adr-row"><strong>Satisfies:</strong> US-03, US-01, US-05, US-07. Grounding check = state machine; tier translation = parallel rendering, explicitly not a state machine. <strong>Rejected:</strong> one explainability report for everyone.</div></div>
     <div class="adr-card"><div class="adr-head"><span class="adr-id">ADR-10</span><span class="adr-title">Distributed tracing &amp; structured logging</span></div><div class="adr-row"><strong>Satisfies:</strong> Paisawala's pipeline health, Trustwell's drift reporting. <strong>Rejected:</strong> folding into Governance &amp; Security — different audience, different failure signature.</div></div>
+    <div class="adr-card"><div class="adr-head"><span class="adr-id">ADR-11</span><span class="adr-title">A2A hub-and-spoke between separate agent services</span></div><div class="adr-row"><strong>Satisfies:</strong> US-07, US-01. The Manager calls Ingest, Detection, Escalation and Governance as separate private Cloud Run services over A2A, authenticated with Google ID tokens, with one retry per stage. <strong>Rejected:</strong> agents chaining to each other directly (the accountability vacuum from ADR-08) and one in-process pipeline. <strong>Accepted tradeoff:</strong> the Governance sync is a bounded wait (25 s from the Manager, 10 s from the web service), not a parallel call, because Cloud Run throttles CPU outside a request. The cost is added latency on the case save and on each decision.</div></div>
 
     <div class="figure">
       <div class="figure-label">Fig. 10.1 — Traceability Matrix</div>
-      <div class="figure-sublabel">Trustwell's column lights up for 5 of 10 ADRs — the architecture was built from §2's personas outward, not justified after the fact.</div>
+      <div class="figure-sublabel">Trustwell's column lights up for 7 of 11 ADRs — the architecture was built from §2's personas outward, not justified after the fact.</div>
       <div class="figure-body" style="overflow-x:auto">
         <table class="comp-table" style="font-size:11px">
           <tr><th></th><th>Overdraft</th><th>Vetter</th><th>Escalade</th><th>Paisawala</th><th>Redact</th><th>Ledger</th><th>Trustwell</th></tr>
@@ -799,6 +800,7 @@ footer.doc-footer { border-top: 1px solid var(--border); padding: 2.5rem; text-a
           <tr><td>ADR-08</td><td></td><td></td><td></td><td></td><td></td><td></td><td>●</td></tr>
           <tr><td>ADR-09</td><td>●</td><td>●</td><td>●</td><td></td><td>●</td><td>●</td><td>●</td></tr>
           <tr><td>ADR-10</td><td></td><td></td><td></td><td>●</td><td></td><td></td><td>●</td></tr>
+          <tr><td>ADR-11</td><td></td><td></td><td></td><td>●</td><td></td><td></td><td>●</td></tr>
         </table>
       </div>
     </div>
@@ -844,6 +846,7 @@ footer.doc-footer { border-top: 1px solid var(--border); padding: 2.5rem; text-a
       <tr class="highlight"><td>Total Gemini API</td><td colspan="2"></td><td>~$85–150/yr</td></tr>
     </table>
     <p class="body-text">Real rate: Gemini 2.5 Flash-Lite, $0.10/$0.40 per million tokens. Infrastructure (Cloud Run, Firestore, BigQuery, Cloud Logging/Trace): illustrative £3,000–£8,000/yr, not vendor-quoted.</p>
+    <p class="body-text"><strong>As built (portfolio POC).</strong> The table above keeps the original design-time assumptions. The POC runs Gemini 3.5 Flash-Lite at $0.30/$2.50 per million tokens, because 2.5 Flash-Lite is being retired. At those rates the Detection row, using the same token assumptions, is about $278/yr rather than $60. Measured on the live POC, a case costs about $0.0006–0.0007. Two corrections to the table: the Escalation row works out to about $7 and the Governance row to about $7.65 at the stated rates, not $10 and $15. In the POC both are rule-based, so they make no model calls and cost nothing in tokens. The Governance sync is also a bounded wait after the case save rather than a parallel step (ADR-11).</p>
 
     <div class="stat-grid" style="grid-template-columns:1fr 1fr">
       <div class="stat-cell"><div class="stat-value teal">£3.1k–8.2k</div><div class="stat-label">Illustrative running cost / year</div></div>
