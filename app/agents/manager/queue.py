@@ -26,22 +26,33 @@ def headline(case):
     return "Model output was rejected by the grounding gates"
 
 
-def build_queue(cases):
-    """Latest case per member, urgent first, oldest first within an urgency."""
+def latest_per_member(cases):
+    """Each member's newest case, whatever state it is in."""
     latest = {}
     for c in cases:
         m = c["member_id"]
         if m not in latest or c["created_at"] > latest[m]["created_at"]:
             latest[m] = c
+    return list(latest.values())
+
+
+def build_queue(cases):
+    """Latest case per member, urgent first, oldest first within an urgency."""
     rows = [{"case_id": c["case_id"], "member_id": c["member_id"], "status": c["status"],
              "urgency": urgency(c), "headline": headline(c), "created_at": c["created_at"]}
-            for c in latest.values()]
+            for c in latest_per_member(cases)]
     return sorted(rows, key=lambda r: (RANK[r["urgency"]], r["created_at"]))
 
 
+def waiting(cases):
+    """What a person still has to review: a member's newest case, if it is pending.
+
+    An older pending case never resurfaces once a newer case exists for the same member."""
+    return build_queue([c for c in latest_per_member(cases) if c.get("review_state") == "pending"])
+
+
 def pending_queue():
-    q = _db().collection(COLLECTION).where(filter=FieldFilter("review_state", "==", "pending"))
-    return build_queue([d.to_dict() for d in q.stream()])
+    return waiting([d.to_dict() for d in _db().collection(COLLECTION).stream()])
 
 
 def override_stats():
